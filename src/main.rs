@@ -61,7 +61,9 @@ fn create_cpp_project(
     let vcpkg_root_path = PathBuf::from(&vcpkg_root_path_str);
 
     let vcpkg_exe_name = if cfg!(windows) { "vcpkg.exe" } else { "vcpkg" };
+    println!("vcpkg_exe_name: {}", vcpkg_exe_name);
     let vcpkg_exe_path = vcpkg_root_path.join(vcpkg_exe_name);
+    println!("vcpkg_exe_path: {:?}", vcpkg_exe_path);
     let vcpkg_cmake_toolchain_path = vcpkg_root_path.join("scripts/buildsystems/vcpkg.cmake");
 
     if !vcpkg_exe_path.is_file() {
@@ -117,9 +119,9 @@ fn create_cpp_project(
     // vcpkg new also creates vcpkg-configuration.json
 
     // 4. Create CMakeLists.txt
-    let main_cpp_file = "main.cpp".to_string(); // Or format!("{}.cpp", project_name.to_lowercase());
+    let main_cpp_file = "main.cc".to_string();
     let cmakelists_content = format!(
-        r#"cmake_minimum_required(VERSION 3.18)
+        r#"cmake_minimum_required(VERSION 3.19)
 project({0} CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -160,13 +162,10 @@ target_link_libraries({0} PRIVATE fmt::fmt) # Example
 #include <iostream>
 
 int main(int argc, char* argv[]) {{
-    fmt::print("Hello from {}!\\n", "{}");
+    fmt::print("Hello from rig!\n");
     return 0;
 }}
-"#,
-        project_name,
-        project_name // First {} is project name, second is for fmt::print
-    );
+"#);
     write_file_content(&project_path.join(&main_cpp_file), &main_cpp_content)?;
 
     // 6. Create CMakePresets.json (content remains the same as before)
@@ -220,11 +219,10 @@ int main(int argc, char* argv[]) {{
             "version": 3,
             "configurePresets": [
               {{
-                "name": "dev-default",
+                "name": "dev",
                 "displayName": "Developer Default (Debug)",
                 "description": "Sets VCPKG_ROOT for local development. DO NOT COMMIT THIS FILE.",
                 "inherits": "debug",
-                "binaryDir": "${{sourceDir}}/build/dev-default",
                 "environment": {{
                   "VCPKG_ROOT": "{}"
                 }}
@@ -232,8 +230,8 @@ int main(int argc, char* argv[]) {{
             ],
             "buildPresets": [
               {{
-                "name": "dev-default",
-                "configurePreset": "dev-default",
+                "name": "dev",
+                "configurePreset": "dev",
                 "displayName": "Build (Dev Default)"
               }}
             ]
@@ -305,10 +303,10 @@ int main(int argc, char* argv[]) {{
     println!("  Path: {:?}", fs::canonicalize(&project_path)?);
     println!("\nNext steps:");
     println!("1. `cd {}`", project_name);
-    println!("2. Configure: `cmake --preset dev-default`"); // This is your main development preset
-    println!("3. Build: `cmake --build --preset dev-default`"); // Use the matching build preset
+    println!("2. Configure: `cmake --preset dev`"); // This is your main development preset
+    println!("3. Build: `cmake --build --preset dev`"); // Use the matching build preset
     println!(
-        "4. Run your executable (e.g., `./build/dev-default/{}` or `build\\dev-default\\{}.exe`)",
+        "4. Run your executable (e.g., `./build/dev/{}` or `build\\dev\\{}.exe`)",
         project_name, project_name
     ); // Adjusted path
     println!("\nTo build a release version (after configuring it):");
