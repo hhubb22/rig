@@ -1,10 +1,7 @@
 // src/main.rs
-
-// Declare modules
 mod cli;
 mod cmake;
 mod config;
-mod project;
 mod utils;
 mod vcpkg;
 mod actions;
@@ -13,7 +10,6 @@ use anyhow::Result;
 use clap::Parser;
 
 use cli::{Args, CliCommand};
-use config::ProjectConfig;
 
 fn main() -> Result<()> {
     let args = Args::parse();
@@ -25,8 +21,7 @@ fn main() -> Result<()> {
             deps,
             std,
         } => {
-            let config = ProjectConfig::new(name, vcpkg_root, deps, std)?;
-            project::create_new_project(&config)?;
+            actions::new::new_project(name, vcpkg_root, deps, std)?;
         }
         CliCommand::Build { preset, clean } => {
             actions::build::build_project(&preset, clean)?;
@@ -38,6 +33,12 @@ fn main() -> Result<()> {
             executable_args,
         } => {
             actions::run::run_project(&preset, target, clean, &executable_args)?;
+        }
+        CliCommand::Add {
+            dependencies,
+            vcpkg_root,
+        } => {
+            actions::add::add_dependencies(&dependencies, vcpkg_root)?;
         }
     }
     Ok(())

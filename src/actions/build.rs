@@ -1,34 +1,24 @@
 // src/actions/build.rs
 use anyhow::{bail, Context, Result};
-use std::env;
 use std::fs;
-use std::path::{Path, PathBuf};
-use std::process::Command as OsCommand; // Renamed to avoid conflict
+use std::path::Path;
+use std::process::Command as OsCommand;
 
-// Helper function to find project root.
-// A more robust version would search upwards for CMakeLists.txt or a .rig-project file.
-fn find_project_root() -> Result<PathBuf> {
-    let current_dir = env::current_dir().context("Failed to get current directory")?;
-    // For now, assume current directory is project root if CMakeLists.txt exists
-    if current_dir.join("CMakeLists.txt").exists() {
-        Ok(current_dir)
-    } else {
-        bail!("CMakeLists.txt not found in current directory or parent directories. Are you in a project?")
-        // Future: Implement upward search
-    }
-}
+use crate::cmake::CMAKELISTS_FILENAME;
+use crate::utils::find_project_root_by_marker; // Renamed to avoid conflict
 
 // Helper to check if CMake configuration is needed
 fn is_cmake_configured(project_root: &Path, preset_name: &str) -> Result<bool> {
-    let build_dir = project_root.join("build").join(preset_name);
     // A simple check: if CMakeCache.txt exists in the build directory for the preset.
     // This isn't foolproof but is a common indicator.
+    let build_dir = project_root.join("build").join(preset_name);
     Ok(build_dir.join("CMakeCache.txt").exists())
 }
 
 
 pub fn build_project(preset_name: &str, clean_build: bool) -> Result<()> {
-    let project_root = find_project_root()?;
+    let project_root = find_project_root_by_marker(CMAKELISTS_FILENAME)
+        .context("Failed to find project root (CMakeLists.txt). Are you in a CMake project?")?;
 
     println!(
         "Building project at '{}' using preset '{}'...",

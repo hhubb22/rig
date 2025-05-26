@@ -12,7 +12,6 @@ pub struct Args {
 pub enum CliCommand {
     /// Creates a new C++ project with CMake and vcpkg
     New {
-        // ... existing fields ...
         name: String,
         #[clap(long)]
         vcpkg_root: Option<String>,
@@ -24,31 +23,32 @@ pub enum CliCommand {
 
     /// Builds the project using a CMake preset
     Build {
-        /// CMake preset to use for building
         #[clap(long, short, default_value = "dev")]
         preset: String,
-
-        /// Perform a clean build (removes existing build directory for the preset)
         #[clap(long)]
         clean: bool,
     },
 
     /// Runs the project's executable (builds first if necessary)
     Run {
-        /// CMake preset to use for building and finding the executable
         #[clap(long, short, default_value = "dev")]
         preset: String,
-
-        /// Name of the executable target. Defaults to the project directory name.
         #[clap(long, short)]
         target: Option<String>,
-
-        /// Perform a clean build before running
         #[clap(long)]
         clean: bool,
-
-        /// Arguments to pass to the executable
         #[clap(last = true)]
         executable_args: Vec<String>,
+    },
+
+    /// Adds one or more dependencies to the project using vcpkg
+    Add {
+        /// Names of the vcpkg ports to add
+        #[clap(required = true, num_args = 1..)]
+        dependencies: Vec<String>,
+
+        /// Path to the VCPKG_ROOT directory (overrides environment variable)
+        #[clap(long)]
+        vcpkg_root: Option<String>,
     },
 }

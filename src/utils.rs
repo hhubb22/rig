@@ -1,8 +1,9 @@
 // src/utils.rs
+use std::env;
 use anyhow::{Context, Result, bail};
 use std::fs;
 use std::io::{self, Write};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 use std::process::Command as OsCommand;
 
 pub fn write_file_content(path: &Path, content: &str) -> Result<()> {
@@ -74,4 +75,21 @@ pub fn handle_project_directory_creation(project_path: &Path, project_name: &str
         .with_context(|| format!("Failed to create project directory: {:?}", project_path))?;
     println!("Created directory: {:?}", project_path);
     Ok(())
+}
+
+/// Searches upwards from the current directory for a specific marker file or directory.
+pub fn find_project_root_by_marker(marker_filename: &str) -> Result<PathBuf> {
+    let mut current_dir = env::current_dir().context("Failed to get current directory")?;
+    loop {
+        if current_dir.join(marker_filename).exists() {
+            return Ok(current_dir);
+        }
+        match current_dir.parent() {
+            Some(parent) => current_dir = parent.to_path_buf(),
+            None => bail!(
+                "Could not find project root: '{}' not found in current directory or any parent.",
+                marker_filename
+            ),
+        }
+    }
 }
