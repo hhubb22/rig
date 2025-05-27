@@ -106,17 +106,17 @@ pub fn generate_cmakeuserpresets_content(vcpkg_root_path: &Path) -> String {
     "testPresets": [ {{ "name": "dev", "configurePreset": "dev" }} ]
 }}"#,
         vcpkg_root_json_escaped,
-        cfg!(windows) {
+        if cfg!(windows) {
             "ninja.exe"
         } else {
             "ninja"
         },
-        cfg!(windows) {
+        if cfg!(windows) {
             "cl.exe"
         } else {
             "clang"
         },
-        cfg!(windows) {
+        if cfg!(windows) {
             "cl.exe"
         } else {
             "clang++"
