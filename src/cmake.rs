@@ -95,13 +95,31 @@ pub fn generate_cmakeuserpresets_content(vcpkg_root_path: &Path) -> String {
             "displayName": "Developer Default (Debug)",
             "inherits": "debug",
             "environment": {{
-                "VCPKG_ROOT": "{}"
+                "VCPKG_ROOT": "{}",
+                "CMAKE_MAKE_PROGRAM": "{}"
+                "CMAKE_C_COMPILER": "{}",
+                "CMAKE_CXX_COMPILER": "{}"
             }}
         }}
     ],
     "buildPresets": [ {{ "name": "dev", "configurePreset": "dev" }} ],
     "testPresets": [ {{ "name": "dev", "configurePreset": "dev" }} ]
 }}"#,
-        vcpkg_root_json_escaped
+        vcpkg_root_json_escaped,
+        cfg!(windows) {
+            "ninja.exe"
+        } else {
+            "ninja"
+        },
+        cfg!(windows) {
+            "cl.exe"
+        } else {
+            "clang"
+        },
+        cfg!(windows) {
+            "cl.exe"
+        } else {
+            "clang++"
+        }
     )
 }
