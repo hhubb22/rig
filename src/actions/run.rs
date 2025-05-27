@@ -69,6 +69,7 @@ pub fn run_project(
     }
 
     println!("Executing: {} {}", exe_path.display(), args.join(" "));
+    println!("================================================");
 
     let mut command = OsCommand::new(&exe_path);
     command.args(args);
