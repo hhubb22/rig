@@ -96,7 +96,7 @@ pub fn generate_cmakeuserpresets_content(vcpkg_root_path: &Path) -> String {
             "inherits": "debug",
             "environment": {{
                 "VCPKG_ROOT": "{}",
-                "CMAKE_MAKE_PROGRAM": "{}"
+                "CMAKE_MAKE_PROGRAM": "{}",
                 "CMAKE_C_COMPILER": "{}",
                 "CMAKE_CXX_COMPILER": "{}"
             }}
