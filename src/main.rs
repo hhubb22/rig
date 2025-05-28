@@ -9,7 +9,7 @@ mod actions;
 use anyhow::Result;
 use clap::Parser;
 
-use cli::{Args, CliCommand};
+use cli::{Args, CliCommand, CleanArgs}; // Added CleanArgs
 
 fn main() -> Result<()> {
     let args = Args::parse();
@@ -39,6 +39,9 @@ fn main() -> Result<()> {
             vcpkg_root,
         } => {
             actions::add::add_dependencies(&dependencies, vcpkg_root)?;
+        }
+        CliCommand::Clean(CleanArgs { preset, all }) => { // Added handler for Clean
+            actions::clean::clean_project(preset, all)?;
         }
     }
     Ok(())

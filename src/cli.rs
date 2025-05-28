@@ -1,5 +1,5 @@
 // src/cli.rs
-use clap::{Parser, Subcommand};
+use clap::{Parser, Subcommand, Args as ClapArgs};
 
 #[derive(Parser)]
 #[clap(author, version, about = "A CLI tool to create C++/CMake/vcpkg projects", long_about = None)]
@@ -51,4 +51,26 @@ pub enum CliCommand {
         #[clap(long)]
         vcpkg_root: Option<String>,
     },
+
+    /// Cleans build artifacts for specified presets or all presets
+    Clean(CleanArgs), // Added Clean subcommand
+}
+
+#[derive(ClapArgs, Debug)] // Added derive Debug
+#[clap(group(
+    clap::ArgGroup::new("scope")
+        .required(false) // If neither is provided, default to cleaning current dir's concept of active build if possible, or error. For now, one is effectively required.
+        .args(&["preset", "all"]),
+))]
+pub struct CleanArgs {
+    /// CMake preset whose build directory to clean
+    #[clap(long, short)]
+    pub preset: Option<String>,
+
+    /// Clean all build directories for all presets
+    #[clap(long, action = clap::ArgAction::SetTrue)] // Ensures --all acts as a flag
+    pub all: bool,
+    // Note: clap will ensure 'preset' and 'all' are not used together if not desired,
+    // or we can add custom validation logic in the handler.
+    // For now, we'll let the action logic handle the precedence (e.g., 'all' overrides 'preset').
 }

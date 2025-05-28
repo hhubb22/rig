@@ -256,6 +256,42 @@ rig add eigen3 range-v3
 2.  Link against the imported targets (e.g., `target_link_libraries(${PROJECT_NAME} PRIVATE <dependency_name>::<dependency_name>)`).
 3.  Re-run CMake configuration (e.g., `cmake --preset dev` or `rig build` which handles it).
 
+#### `rig clean`
+
+Cleans build artifacts. You can specify a preset to clean its build directory or clean all build directories.
+
+```bash
+rig clean [OPTIONS]
+```
+
+**Options:**
+
+*   `-p, --preset <PRESET>`:
+    CMake preset whose build directory should be cleaned (e.g., `dev`, `release`).
+*   `--all`:
+    Clean all build directories under the main `build/` folder. This will remove `build/<preset1>`, `build/<preset2>`, etc.
+
+**Mutually Exclusive:**
+
+You should specify either a preset or --all, but not both. If neither is specified, the command will prompt for one. (Note: The current implementation requires one, this can be refined.)
+
+**Example:**
+
+```bash
+# Clean build artifacts for the 'dev' preset
+rig clean --preset dev
+
+# Clean build artifacts for the 'release' preset
+rig clean -p release
+
+# Clean all build artifacts for all presets
+rig clean --all
+```
+
+**Important:** 
+
+This command removes files and directories. Use with caution, especially the --all flag.
+
 ## Environment Variables
 
 *   `VCPKG_ROOT`: Rig relies heavily on this variable to locate your vcpkg installation. Ensure it's set correctly. It can be overridden on a per-command basis using the `--vcpkg-root` option where available.
